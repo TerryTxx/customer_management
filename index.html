@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <link rel="stylesheet" href="./static/css/bootstrap.min.css">
+    <script src="./static/js/jquery.min.js"></script>
+    <script src="./static/js/bootstrap.min.js"></script>
+    <script src="./static/js/bootstrapValidator.js"></script>
+    <style>
+        .help-block,.red{
+            color: red;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>用户列表</h1>
+    <form class="form-inline mb-3">
+        <label class="form-inline mr-1">
+            <input style="display: inline" id="keyword" type="text" class="form-control" placeholder="标题|姓氏|姓名|手机|邮箱关键词">
+        </label>
+        <label class="form-inline mr-3">
+            <button type="button" class="btn btn-primary" data-toggle="modal" id="search">查询</button>
+        </label>
+        <label class="form-inline">
+            <button type="button" class="btn btn-primary" data-toggle="modal" id="addUserModalBtn">添加用户</button>
+        </label>
+    </form>
+    <table class="table" id="userTable">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>标题</th>
+            <th>名字</th>
+            <th>姓氏</th>
+            <th>手机</th>
+            <th>邮箱</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="userList"></tbody>
+    </table>
+</div>
+<!-- 添加/编辑用户模态框 -->
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">添加用户</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm" role="form">
+                    <div class="form-group">
+                        <label for="title">标题</label>
+                        <input type="text" class="form-control" id="title" name="title" >
+                    </div>
+                    <div class="form-group">
+                        <label for="first_name">名字<span class="red">*</span></label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sur_name">姓氏<span class="red">*</span></label>
+                        <input type="text" class="form-control" id="sur_name" name="sur_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">手机<span class="red">*</span></label>
+                        <input type="mobile" class="form-control" id="mobile" name="mobile" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">邮箱<span class="red">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveUserBtn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 地址列表 -->
+<div class="modal fade" id="showAddressModal" tabindex="-1" role="dialog" aria-labelledby="showAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="max-width: 1000px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="showAddressModalLabel">地址列表</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button class="btn btn-primary mb-3" data-toggle="modal" id="addAddressModalBtn">添加地址</button>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>home_address</th>
+                        <th>shipping_address</th>
+                        <th>city_town</th>
+                        <th>county</th>
+                        <th>eircode</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="addressList"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加/编辑地址 -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">添加地址</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm" role="form">
+                    <div class="form-group">
+                        <label for="home_address">HomeAddress<span class="red">*</span></label>
+                        <input type="text" class="form-control" id="home_address" name="home_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping_address">ShippingAddress</label>
+                        <input type="text" class="form-control" id="shipping_address" name="shipping_address">
+                    </div>
+                    <div class="form-group">
+                        <label for="city_town">CityTown<span class="red">*</span></label>
+                        <input type="text" class="form-control" id="city_town" name="city_town" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="county">County<span class="red">*</span></label>
+                        <input type="text" class="form-control" id="county" name="county" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eircode">Eircode</label>
+                        <input type="text" class="form-control" id="eircode" name="eircode">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveAddressBtn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+
+        function getUserList(){
+            // 获取用户列表
+            $.get('index.php?action=getUserList&keyword='+$('#keyword').val(), function(data) {
+                $('#userList').html(data);
+            });
+        }
+        $('#search').click(function(){
+            getUserList();
+        })
+        getUserList();
+
+        // 验证提交数据
+        $("#addUserForm").bootstrapValidator({
+            live: 'enabled',//验证时机，enabled是内容有变化就验证（默认），disabled和submitted是提交再验证
+            excluded: [':disabled', ':hidden', ':not(:visible)'],//排除无需验证的控件，比如被禁用的或者被隐藏的
+            submitButtons: '#saveUserBtn',//指定提交按钮，如果验证失败则变成disabled，但我没试成功，反而加了这句话非submit按钮也会提交到action指定页面
+            message: '请正确输入该值',
+            feedbackIcons: {//根据验证结果显示的各种图标
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                first_name: {
+                    validators: {
+                        notEmpty: {//检测非空,radio也可用
+                            message: '请输入名字'
+                        },
+                        stringLength: {//检测长度
+                            min: 1,
+                            max: 30,
+                            message: '长度必须在3-10之间'
+                        },
+                    }
+                },
+                sur_name: {
+                    validators: {
+                        notEmpty: {//检测非空,radio也可用
+                            message: '请输入姓氏'
+                        },
+                        stringLength: {//检测长度
+                            min: 1,
+                            max: 30,
+                            message: '长度必须在3-10之间'
+                        },
+                    }
+                },
+                email: {
+                    validators: {
+                        emailAddress: {
+                            message: '不是正确的email地址'
+                        },
+                        notEmpty: {
+                            message: '请输入邮箱'
+                        },
+                    }
+                },
+                mobile: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入手机'
+                        },
+                        stringLength: {//检测长度
+                            min: 11,
+                            max: 11,
+                            message: '长度必须在11位'
+                        },
+                    }
+                },
+            }
+        });
+
+        $('#addUserModalBtn').on('click',function(){
+            $('#addUserModalLabel').text('添加用户');
+            $('#title').val("");
+            $('#first_name').val("");
+            $('#sur_name').val("");
+            $('#mobile').val("");
+            $('#email').val("");
+            $('#addUserModal').modal('show');
+        })
+        // 添加/编辑
+        $("#saveUserBtn").click(function () {//非submit按钮点击后进行验证，如果是submit则无需此句直接验证
+            $("#addUserForm").bootstrapValidator('validate');//提交验证
+            if ($("#addUserForm").data('bootstrapValidator').isValid()) {//获取验证结果，如果成功，执行下面代码
+                var data = $('#addUserForm').serialize() + '&id=' + $(this).data('id');
+                // 开始提交
+                $.ajax({
+                    url: 'index.php?action=saveUser',
+                    method: 'POST', // 使用PUT请求方法
+                    data: data,
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.success) {
+                            $('#addUserModal').modal('hide');
+                            location.reload();
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                });
+            }
+        });
+
+        // 获取编辑用户详情
+        $('#userList').on('click', '.editUserBtn', function() {
+            var id = $(this).data('id');
+            $.get('index.php?action=getUserDetail&id=' + id, function(result) {
+                if (result.success) {
+                    var user = result.data;
+                    $('#addUserModalLabel').text('编辑用户');
+
+                    $('#title').val(user.title);
+                    $('#first_name').val(user.first_name);
+                    $('#sur_name').val(user.sur_name);
+                    $('#mobile').val(user.mobile);
+                    $('#email').val(user.email);
+                    $('#saveUserBtn').data('id', id);
+                    $('#addUserModal').modal('show');
+                } else {
+                    alert(result.message);
+                }
+            }, 'json');
+        });
+
+        // 删除用户
+        $('#userList').on('click', '.deleteUserBtn', function() {
+            var id = $(this).data('id');
+            if (confirm('确定要删除该用户吗？')) {
+                $.ajax({
+                    url: 'index.php?action=delUser&id=' + id,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                });
+            }
+        });
+
+        function getAddressList(pid){
+            $('#addressList').html('<tr><td colspan="6">Loading</td></tr>');
+            // 获取城市列表
+            $.get('index.php?action=getAddressList&pid='+pid, function(data) {
+                $('#addressList').html(data);
+                $('#showAddressModal').modal('show');
+            });
+        }
+
+        //显示地址列表
+        $('#userList').on('click','.showAddressBtn',function(){
+            // 附加pid
+            var pid = $(this).data('pid');
+            $('#saveAddressBtn').data('pid', pid);
+            getAddressList(pid);
+        })
+
+        // 验证提交数据
+        $("#addAddressForm").bootstrapValidator({
+            live: 'enabled',//验证时机，enabled是内容有变化就验证（默认），disabled和submitted是提交再验证
+            excluded: [':disabled', ':hidden', ':not(:visible)'],//排除无需验证的控件，比如被禁用的或者被隐藏的
+            submitButtons: '#saveUserBtn',//指定提交按钮，如果验证失败则变成disabled，但我没试成功，反而加了这句话非submit按钮也会提交到action指定页面
+            message: '请正确输入该值',
+            feedbackIcons: {//根据验证结果显示的各种图标
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                home_address: {
+                    validators: {
+                        notEmpty: {//检测非空,radio也可用
+                            message: '请输入HomeAddress'
+                        },
+                        stringLength: {//检测长度
+                            min: 1,
+                            max: 30,
+                            message: '长度必须在3-10之间'
+                        },
+                    }
+                },
+                city_town: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入CityTown'
+                        },
+                    }
+                },
+                county: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入County'
+                        },
+                    }
+                },
+            }
+        });
+
+        // 显示填写框
+        $('#addAddressModalBtn').on('click',function(){
+            $('#addAddressModalLabel').text('添加地址');
+            $('#home_address').val("");
+            $('#shipping_address').val("");
+            $('#city_town').val("");
+            $('#county').val("");
+            $('#eircode').val("");
+
+            // 保留pid 移除id
+            $('#saveAddressBtn').data('id','');
+            $('#addAddressModal').modal('show');
+        })
+
+        // 添加/编辑
+        $("#saveAddressBtn").click(function () {//非submit按钮点击后进行验证，如果是submit则无需此句直接验证
+            let id = $(this).data('id');
+            let pid = $(this).data('pid');
+            $("#addAddressForm").bootstrapValidator('validate');//提交验证
+            if ($("#addAddressForm").data('bootstrapValidator').isValid()) {//获取验证结果，如果成功，执行下面代码
+                var data = $('#addAddressForm').serialize() + '&id=' + id + '&pid=' + pid;
+                // 开始提交
+                $.ajax({
+                    url: 'index.php?action=saveAddress',
+                    method: 'POST', // 使用PUT请求方法
+                    data: data,
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.success) {
+                            $('#addAddressModal').modal('hide');
+                            getAddressList(pid);
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                });
+            }
+        });
+
+        // 获取编辑地址详情
+        $('#addressList').on('click', '.editAddressBtn', function() {
+            var id = $(this).data('id');
+            var pid = $(this).data('pid');
+
+            $('#saveAddressBtn').data('id', id);
+            $('#saveAddressBtn').data('pid', pid);
+
+            $.get('index.php?action=getAddressDetail&id=' + id, function(result) {
+                if (result.success) {
+                    var data = result.data;
+                    $('#addAddressModalLabel').text('编辑地址');
+                    $('#home_address').val(data.home_address);
+                    $('#shipping_address').val(data.shipping_address);
+                    $('#city_town').val(data.city_town);
+                    $('#county').val(data.county);
+                    $('#eircode').val(data.eircode);
+                    $('#addAddressModal').modal('show');
+                } else {
+                    alert(result.message);
+                }
+            }, 'json');
+        });
+        // 删除地址
+        $('#addressList').on('click', '.deleteAddressBtn', function() {
+            var id = $(this).data('id');
+            var pid = $(this).data('pid');
+            if (confirm('确定要删除该地址吗？')) {
+                $.ajax({
+                    url: 'index.php?action=delAddress&id=' + id,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.success) {
+                            getAddressList(pid);
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
